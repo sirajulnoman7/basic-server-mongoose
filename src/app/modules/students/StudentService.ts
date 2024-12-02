@@ -1,4 +1,4 @@
-import { StudentModel } from '../students.schema.module';
+import { StudentModel } from './students.schema.module';
 
 //  service to handle connecting database
 // const createStudentInDB = async (student: Students) => {

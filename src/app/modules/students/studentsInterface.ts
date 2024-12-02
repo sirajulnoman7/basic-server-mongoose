@@ -20,13 +20,12 @@ export type LocalGuardant = {
 };
 
 export type Students = {
-  idx: string;
   age: number;
   name: Name;
   address: string;
   email: string;
   contactNo: string;
-  dateOfBirth?: string;
+  dateOfBirth?: Date;
   gender: 'male' | 'female';
   emergenceContactNo?: string;
   bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
@@ -37,6 +36,7 @@ export type Students = {
   password: string;
   isDelete: boolean;
   id: string;
+  admissionSemester: Types.ObjectId;
   user: Types.ObjectId; //user referencing with student interface
 };
 

@@ -6,7 +6,7 @@ import {
   StudentModelInstance,
   Students,
   StudentsMethod,
-} from './students/studentsInterface';
+} from './studentsInterface';
 
 const nameSchema = new Schema<Name>({
   firstName: {
@@ -55,6 +55,10 @@ const studentSchema = new Schema<
 >(
   {
     name: { type: nameSchema },
+    id: {
+      type: String,
+      required: [true, 'ID is required'],
+    },
     email: {
       type: String,
       required: true,
@@ -77,8 +81,12 @@ const studentSchema = new Schema<
     guardant: guardantSchema,
     localGuardant: localGuardantSchema,
     isDelete: { type: Boolean, default: false },
-    idx: { type: String },
-    id: String,
+    dateOfBirth: { type: Date },
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'user is i required'],
+      ref: 'AcademicSemester',
+    },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'user is i required'],
@@ -90,6 +98,7 @@ const studentSchema = new Schema<
     toJSON: {
       virtuals: true,
     },
+    timestamps: true,
   },
 );
 

@@ -1,6 +1,9 @@
 import config from '../../config';
-import { StudentModel } from '../students.schema.module';
+import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
+import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
+import { StudentModel } from '../students/students.schema.module';
 import { Students } from '../students/studentsInterface';
+import { generateStudentId } from './user.utilitis';
 import { TUser } from './userInterface';
 import userModel from './userModel';
 
@@ -12,8 +15,16 @@ const createStudentInDB = async (password: string, studentData: Students) => {
   //    set a role student
   userData.role = 'student';
 
+  // find academic semester info
+  const admissionSemester = await AcademicSemesterModel.findById(
+    studentData.admissionSemester,
+  );
+
+  // set  generated id
+  userData.id = await generateStudentId(admissionSemester);
+
   // default generated id
-  userData.id = '203012345';
+  // userData.id = '203012345';
   const newUser = await userModel.create(userData);
   //   create student new student
   if (Object.keys(newUser).length) {
