@@ -12,5 +12,20 @@ academicSemesterRoute.post(
   ),
   academicSemesterController.createAcademicSemester,
 );
+academicSemesterRoute.get(
+  '/',
+  academicSemesterController.getAllAcademicSemestersFromDB,
+);
+academicSemesterRoute.get(
+  '/:semesterId',
+  academicSemesterController.getSingleAcademicSemesterFromDB,
+);
+academicSemesterRoute.patch(
+  '/:semesterId',
+  checkValidationRequest(
+    academicSemesterValidations.updateAcademicSemesterValidationSchema,
+  ),
+  academicSemesterController.updateAcademicSemesterIntoDB,
+);
 
 export default academicSemesterRoute;

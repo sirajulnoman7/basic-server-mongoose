@@ -79,6 +79,7 @@ const studentSchemaValidationZod = z.object({
       contactNo: z.string().max(15, 'Contact number must not exceed 15 digits'),
       dateOfBirth: z.date().optional(),
       admissionSemester: z.string(),
+      academicDepartment: z.string(),
       gender: z.enum(['male', 'female'], {
         required_error: 'Gender is required',
       }), // Fixed enum validation

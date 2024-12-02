@@ -10,7 +10,14 @@ import { StudentModel } from './students.schema.module';
 // const fullName: string = user.fullName(); // 'Jean-Luc Picard'
 
 const getStudentInDB = async () => {
-  const result = await StudentModel.find();
+  const result = await StudentModel.find()
+    .populate('admissionSemester')
+    .populate({
+      path: 'academicDepartment',
+      populate: {
+        path: 'academicFaculty',
+      },
+    });
   return result;
 };
 

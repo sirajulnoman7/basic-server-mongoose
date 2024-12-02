@@ -87,11 +87,17 @@ const studentSchema = new Schema<
       required: [true, 'user is i required'],
       ref: 'AcademicSemester',
     },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'user is i required'],
+      ref: 'academic-department',
+    },
+
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'user is i required'],
       unique: true,
-      ref: 'userModel',
+      ref: 'user',
     },
   },
   {

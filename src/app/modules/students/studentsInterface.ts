@@ -37,6 +37,7 @@ export type Students = {
   isDelete: boolean;
   id: string;
   admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   user: Types.ObjectId; //user referencing with student interface
 };
 
