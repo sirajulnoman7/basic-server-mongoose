@@ -63,7 +63,7 @@ const studentSchema = new Schema<
       type: String,
       required: true,
     },
-    contactNo: { type: String, required: true },
+    contactNo: { type: String, required: true, unique: true },
     gender: {
       type: String,
       enum: { values: ['male', 'female'], message: '{VALUE} is not supported' },
