@@ -125,12 +125,12 @@ const studentSchema = new Schema<
 // });
 
 // mongoose virtual method
-// studentSchema.virtual('fullname').get(function () {
-//   return `${this.firstName} ${this.lastName}`;
-// });
-// studentSchema.virtual("fullName").get(function(){
-//    return `${this.firstName} ${this.middleName}`
-// })
+studentSchema.virtual('fullname').get(function () {
+  return `${this?.name?.firstName} ${this?.name?.lastName}`;
+});
+studentSchema.virtual('fullName').get(function () {
+  return `${this?.name?.firstName} ${this?.name?.middleName}`;
+});
 
 //  Create a Model.
 

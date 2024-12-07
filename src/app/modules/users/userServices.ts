@@ -3,10 +3,14 @@ import config from '../../config';
 import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
 import { StudentModel } from '../students/students.schema.module';
 import { Students } from '../students/studentsInterface';
-import { generateStudentId } from './user.utilitis';
+import { generateFacultyId, generateStudentId } from './user.utilitis';
 import { TUser } from './userInterface';
 import userModel from './userModel';
 import AppError from '../../Error/AppError';
+import TFaculty from '../faculty/facultyInterface';
+import facultyModel from '../faculty/faculty.model';
+import mongoose from 'mongoose';
+import academicDepartmentModel from '../academicDepartment/academicDepartmentModel';
 
 const createStudentInDB = async (password: string, studentData: Students) => {
   //   create a user obj
@@ -52,6 +56,48 @@ const createStudentInDB = async (password: string, studentData: Students) => {
   }
 };
 
+const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+  const userData: Partial<TUser> = {};
+  userData.role = 'faculty';
+
+  userData.password = password || (config.default_password as string);
+  // find academic department info
+  const academicDepartment = await academicDepartmentModel.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(400, 'Academic department not found');
+  }
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    userData.id = await generateFacultyId();
+    const newUser = await userModel.create([userData], { session });
+    if (!newUser.length) {
+      throw new AppError(404, 'Fiend to create user');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const createNewFaculty = await facultyModel.create([payload], { session });
+
+    if (!createNewFaculty.length) {
+      throw new AppError(400, 'Fiend to create student');
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return createNewFaculty[0];
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+
+    throw new Error(err);
+  }
+};
+
 export const userServices = {
   createStudentInDB,
+  createFacultyIntoDB,
 };

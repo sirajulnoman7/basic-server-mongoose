@@ -1,5 +1,6 @@
 import { userServices } from './userServices';
 import catchAsync from '../../utilits/catchAsync';
+import sendResponse from '../../utilits/rsendResponse';
 
 const createStudent = catchAsync(async (req, res) => {
   const { password, studentData } = req.body;
@@ -13,6 +14,18 @@ const createStudent = catchAsync(async (req, res) => {
   });
 });
 
+const createFaculty = catchAsync(async (req, res) => {
+  const { password, faculty: facultyData } = req.body;
+  const result = await userServices.createFacultyIntoDB(password, facultyData);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'faculty created successfully',
+    data: result,
+  });
+});
+
 export const userController = {
   createStudent,
+  createFaculty,
 };
