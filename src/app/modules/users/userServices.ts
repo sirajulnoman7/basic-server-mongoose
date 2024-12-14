@@ -3,7 +3,11 @@ import config from '../../config';
 import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
 import { StudentModel } from '../students/students.schema.module';
 import { Students } from '../students/studentsInterface';
-import { generateFacultyId, generateStudentId } from './user.utilitis';
+import {
+  generateAdminId,
+  generateFacultyId,
+  generateStudentId,
+} from './user.utilitis';
 import { TUser } from './userInterface';
 import userModel from './userModel';
 import AppError from '../../Error/AppError';
@@ -11,6 +15,8 @@ import TFaculty from '../faculty/facultyInterface';
 import facultyModel from '../faculty/faculty.model';
 import mongoose from 'mongoose';
 import academicDepartmentModel from '../academicDepartment/academicDepartmentModel';
+import { TAdmin } from '../Admin/adminInterface';
+import adminModel from '../Admin/adminModel';
 
 const createStudentInDB = async (password: string, studentData: Students) => {
   //   create a user obj
@@ -97,7 +103,41 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 
+// =======================admin-=============
+
+const creteAdminIntoDb = async (password: string, payload: TAdmin) => {
+  const userData: Partial<TUser> = {};
+  userData.password = password || (config.default_password as string);
+  userData.role = 'admin';
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    userData.id = await generateAdminId();
+    const newUser = await userModel.create([userData], { session });
+    if (!newUser.length) {
+      throw new AppError(404, 'Fiend to create user');
+    }
+
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id;
+
+    const createAdmin = await adminModel.create([payload], { session });
+
+    if (!createAdmin.length) {
+      throw new AppError(404, 'Fiend to create admin');
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    return createAdmin[0];
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw Error(err);
+  }
+};
+
 export const userServices = {
   createStudentInDB,
   createFacultyIntoDB,
+  creteAdminIntoDb,
 };

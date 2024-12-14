@@ -21,7 +21,7 @@ createAcademicDepartmentSchema.pre('save', async function (next) {
   const isDepartmentExits = await academicDepartmentModel.findOne({
     name: this.name,
   });
-  if (!isDepartmentExits) {
+  if (isDepartmentExits) {
     throw new AppError(400, 'department already exist');
   }
   next();
