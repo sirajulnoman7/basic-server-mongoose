@@ -9,4 +9,8 @@ export default {
   mongoDB_URL: process.env.mongoDBURL,
   saltRound: process.env.saltRounds,
   default_password: process.env.defaultPassword,
+  jwt_token_secret: process.env.jwt_token_secret,
+  refresh_jwt_token_secret: process.env.refresh_jwt_token_secret,
+  access_token_expiresIn: process.env.access_token_expiresIn,
+  refresh_token_expiresIn: process.env.refresh_token_expiresIn,
 };
