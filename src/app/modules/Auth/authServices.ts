@@ -4,6 +4,7 @@ import { TAuth } from './authInterface';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import { sendEmail } from '../../utilits/sendEmail';
 
 const loginUser = async (payload: TAuth) => {
   const user = await userModel.isUserExistFindByCustomId(payload?.id);
@@ -163,8 +164,82 @@ const createRefreshToken = async (token: string) => {
   return accessToken;
 };
 
+const forgetPassword = async (userId: string) => {
+  const user = await userModel.isUserExistFindByCustomId(userId);
+  // console.log(user);
+
+  // console.log(user);
+  if (!user) {
+    throw new AppError(400, 'User not found');
+  }
+
+  if (user?.status === 'blocked') {
+    throw new AppError(400, 'user is already blocked');
+  }
+
+  if (user?.isDeleted) {
+    throw new AppError(400, 'user is already deleted');
+  }
+  const jwtPayload = {
+    id: user?.id,
+    role: user?.role,
+  };
+  const resetToken = jwt.sign(
+    {
+      jwtPayload,
+    },
+    config.jwt_token_secret as string,
+    { expiresIn: '10m' },
+  );
+  const resetPasswordUILink = `${config.reset_pass_ui_link}/?id=${userId}&token=${resetToken}`;
+  sendEmail(user?.email, resetPasswordUILink);
+  console.log(resetPasswordUILink);
+};
+
+const resetPassword = async (
+  payload: { userId: string; newPassword: string },
+  token: string,
+) => {
+  const user = await userModel.isUserExistFindByCustomId(payload.userId);
+
+  if (!user) {
+    throw new AppError(400, 'User not found');
+  }
+
+  if (user?.status === 'blocked') {
+    throw new AppError(400, 'user is already blocked');
+  }
+
+  if (user?.isDeleted) {
+    throw new AppError(400, 'user is already deleted');
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.jwt_token_secret as string,
+  ) as JwtPayload;
+  // console.log(decoded);
+  if (decoded.jwtPayload.id !== payload.userId) {
+    throw new AppError(401, 'you are not authorized');
+  }
+  const newPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.saltRound),
+  );
+
+  await userModel.findOneAndUpdate(
+    { id: payload.userId },
+    {
+      password: newPassword,
+      needsPasswordChange: false,
+      passwordChangeTime: new Date(),
+    },
+  );
+};
 export const authServices = {
   loginUser,
   changePassword,
   createRefreshToken,
+  forgetPassword,
+  resetPassword,
 };

@@ -3,7 +3,9 @@ import { authController } from './authController';
 import {
   authChangePasswordValidationSchema,
   authValidationSchema,
+  forgetPasswordValidationSchema,
   refreshTokenValidationSchema,
+  resetPasswordValidationSchema,
 } from './AuthValidation';
 import checkValidationRequest from '../../middlewares/checkValidationRequest';
 import checkAuth from '../../middlewares/checkAuth';
@@ -26,6 +28,17 @@ authRoute.post(
   '/refresh-token',
   checkValidationRequest(refreshTokenValidationSchema),
   authController.createRefreshToken,
+);
+
+authRoute.post(
+  '/forgot-password',
+  checkValidationRequest(forgetPasswordValidationSchema),
+  authController.forgetPassword,
+);
+authRoute.post(
+  '/reset-password',
+  checkValidationRequest(resetPasswordValidationSchema),
+  authController.resetPassword,
 );
 
 export default authRoute;

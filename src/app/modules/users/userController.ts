@@ -1,6 +1,7 @@
 import { userServices } from './userServices';
 import catchAsync from '../../utilits/catchAsync';
 import sendResponse from '../../utilits/rsendResponse';
+import AppError from '../../Error/AppError';
 
 const createStudent = catchAsync(async (req, res) => {
   const { password, studentData } = req.body;
@@ -34,9 +35,41 @@ const createAdmin = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getMe = catchAsync(async (req, res) => {
+  // const token = req.headers.authorization;
+  // if (!token) {
+  //   throw new AppError(401, 'you are not authorized');
+  // }
+
+  const decoded = req.user;
+
+  const userId = decoded.jwtPayload.id;
+  const role = decoded.jwtPayload.role;
+  const result = await userServices.getMe(userId, role);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'user fetched successfully',
+    data: result,
+  });
+});
+
+const changeStatus = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  // console.log(id);
+  const result = await userServices.changeStatus(id, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'status updated successfully',
+    data: result,
+  });
+});
 
 export const userController = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
+  changeStatus,
 };

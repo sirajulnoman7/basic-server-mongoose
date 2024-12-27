@@ -13,4 +13,5 @@ export default {
   refresh_jwt_token_secret: process.env.refresh_jwt_token_secret,
   access_token_expiresIn: process.env.access_token_expiresIn,
   refresh_token_expiresIn: process.env.refresh_token_expiresIn,
+  reset_pass_ui_link: process.env.reset_pass_ui_link,
 };

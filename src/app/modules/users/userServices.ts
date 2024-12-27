@@ -17,6 +17,8 @@ import mongoose from 'mongoose';
 import academicDepartmentModel from '../academicDepartment/academicDepartmentModel';
 import { TAdmin } from '../Admin/adminInterface';
 import adminModel from '../Admin/adminModel';
+import { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 const createStudentInDB = async (password: string, studentData: Students) => {
   //   create a user obj
@@ -25,6 +27,8 @@ const createStudentInDB = async (password: string, studentData: Students) => {
 
   //    set a role student
   userData.role = 'student';
+  // student email set
+  userData.email = studentData.email;
 
   // find academic semester info
   const admissionSemester = await AcademicSemesterModel.findById(
@@ -65,6 +69,8 @@ const createStudentInDB = async (password: string, studentData: Students) => {
 const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   const userData: Partial<TUser> = {};
   userData.role = 'faculty';
+  // faculty email set
+  userData.email = payload.email;
 
   userData.password = password || (config.default_password as string);
   // find academic department info
@@ -108,7 +114,10 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 const creteAdminIntoDb = async (password: string, payload: TAdmin) => {
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_password as string);
+  // admin role set
   userData.role = 'admin';
+  // admin email set
+  userData.email = payload.email;
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -136,8 +145,37 @@ const creteAdminIntoDb = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (userId: string, role: string) => {
+  // const decoded = jwt.verify(
+  //   token,
+  //   config.jwt_token_secret as string,
+  // ) as JwtPayload;
+  // const userId = decoded.jwtPayload.id;
+  // const role = decoded.jwtPayload.role;
+  let result = null;
+  if (role === 'student') {
+    result = await StudentModel.findOne({ id: userId });
+  }
+  if (role === 'faculty') {
+    result = await facultyModel.findOne({ id: userId });
+  }
+  if (role === 'admin') {
+    result = await adminModel.findOne({ id: userId });
+  }
+  return result;
+};
+
+const changeStatus = async (id: string, payload: { status: string }) => {
+  // console.log(status);
+  const result = await userModel.findByIdAndUpdate(id, payload, { new: true });
+
+  return result;
+};
+
 export const userServices = {
   createStudentInDB,
   createFacultyIntoDB,
   creteAdminIntoDb,
+  getMe,
+  changeStatus,
 };
