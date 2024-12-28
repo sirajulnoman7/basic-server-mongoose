@@ -64,6 +64,7 @@ const studentSchema = new Schema<
       required: true,
     },
     contactNo: { type: String, required: true, unique: true },
+    profileImg: { type: String },
     gender: {
       type: String,
       enum: { values: ['male', 'female'], message: '{VALUE} is not supported' },

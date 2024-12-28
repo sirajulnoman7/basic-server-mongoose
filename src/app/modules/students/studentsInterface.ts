@@ -25,6 +25,7 @@ export type Students = {
   address: string;
   email: string;
   contactNo: string;
+  profileImg: string;
   dateOfBirth?: Date;
   gender: 'male' | 'female';
   emergenceContactNo?: string;

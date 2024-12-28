@@ -19,8 +19,14 @@ import { TAdmin } from '../Admin/adminInterface';
 import adminModel from '../Admin/adminModel';
 import { JwtPayload } from 'jsonwebtoken';
 import jwt from 'jsonwebtoken';
+import sendImageToCloudinary from '../../utilits/sendImageToCloudinary';
 
-const createStudentInDB = async (password: string, studentData: Students) => {
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+const createStudentInDB = async (
+  password: string,
+  studentData: Students,
+  file: any,
+) => {
   //   create a user obj
   const userData: Partial<TUser> = {}; //partial type to convert optional with main type
   userData.password = password || (config.default_password as string);
@@ -28,7 +34,7 @@ const createStudentInDB = async (password: string, studentData: Students) => {
   //    set a role student
   userData.role = 'student';
   // student email set
-  userData.email = studentData.email;
+  userData.email = studentData?.email;
 
   // find academic semester info
   const admissionSemester = await AcademicSemesterModel.findById(
@@ -43,6 +49,13 @@ const createStudentInDB = async (password: string, studentData: Students) => {
   try {
     session.startTransaction();
     //  create user first transaction
+
+    // cloudinary upload---------------------------
+    const path = file?.path;
+    const profileImage = `${userData.id}${studentData?.name?.firstName}`;
+
+    const { secure_url } = await sendImageToCloudinary(path, profileImage);
+
     const newUser = await userModel.create([userData], { session }); //user data is a array
 
     if (!newUser.length) {
@@ -51,6 +64,7 @@ const createStudentInDB = async (password: string, studentData: Students) => {
     //   create student new student
     studentData.id = newUser[0].id; //embed id
     studentData.user = newUser[0]._id; //reference id
+    studentData.profileImg = secure_url;
     //  create user second transaction
     const newStudent = await StudentModel.create([studentData], { session });
     if (!newStudent.length) {

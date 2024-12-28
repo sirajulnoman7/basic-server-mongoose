@@ -61,7 +61,7 @@ const localGuardantSchema = z.object({
 // Students Schema
 const studentSchemaValidationZod = z.object({
   body: z.object({
-    password: z.string(),
+    password: z.string().optional(),
     studentData: z.object({
       age: z
         .number()
